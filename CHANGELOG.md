@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.2 - 2026-06-29
+
+Documentation update for public setup.
+
+### Changed
+
+- Make README setup instructions user-agnostic.
+- Add clearer Xcode configuration steps for installed npm package users.
+- Document how to find the `pi-xcode` executable path with `command -v pi-xcode`.
+- Document how to find the Node interpreter path with `node -p 'process.execPath'`.
+- Clarify that Node.js 20+ is required and Node 24 is recommended.
+
 ## 0.2.1 - 2026-06-29
 
 Release-cycle validation update for the scoped npm package.

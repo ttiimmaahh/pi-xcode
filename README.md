@@ -6,7 +6,7 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 
 ## Status
 
-`pi-xcode` 0.2.0 is a release candidate validated as an Xcode-launched ACP adapter:
+`pi-xcode` 0.2.2 is validated as an Xcode-launched ACP adapter:
 
 - Xcode can add and launch `pi-xcode` as an ACP agent.
 - Xcode conversations stream Pi responses.
@@ -18,22 +18,37 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 ## Requirements
 
 - **Xcode 27 or newer.** Xcode custom ACP agents are an Xcode 27+ feature. Xcode 27 is currently beta-only; Xcode 26 and earlier cannot launch `pi-xcode` as an Intelligence custom agent.
-- Node.js 20 or newer. Node 24 is used for local validation.
+- **Node.js 20 or newer.** Node 24 is recommended and is used for release validation.
 - A working Pi configuration with an authenticated provider/model.
+
+Check your Node version with:
+
+```bash
+node --version
+```
 
 ## Install
 
-For local development:
-
-```bash
-npm install
-npm run build
-```
-
-After a public npm release, install with:
+Install the published package globally:
 
 ```bash
 npm install -g @ttiimmaahh/pi-xcode
+```
+
+Verify the executable is available:
+
+```bash
+which pi-xcode
+pi-xcode --help
+```
+
+For local development from a source checkout:
+
+```bash
+git clone https://github.com/ttiimmaahh/pi-xcode.git
+cd pi-xcode
+npm install
+npm run build
 ```
 
 Make sure Pi itself is authenticated/configured before launching from Xcode:
@@ -49,14 +64,81 @@ or configure provider API keys in your shell environment / Pi auth storage.
 
 > **Requires Xcode 27+.** If your Xcode Settings → Intelligence pane does not have custom agent support, you are probably running Xcode 26 or earlier. Install/use the Xcode 27 beta or newer before configuring `pi-xcode`.
 
+### Recommended setup: installed npm package
+
+After installing globally, find the exact paths Xcode needs.
+
+Print the `pi-xcode` executable path:
+
+```bash
+command -v pi-xcode
+```
+
+Print the Node executable path:
+
+```bash
+node -p 'process.execPath'
+```
+
+The outputs might look like one of these, depending on your Node/npm setup:
+
+```text
+/opt/homebrew/bin/pi-xcode
+/usr/local/bin/pi-xcode
+/Users/you/.nvm/versions/node/<node-version>/bin/pi-xcode
+```
+
+```text
+/opt/homebrew/bin/node
+/usr/local/bin/node
+/Users/you/.nvm/versions/node/<node-version>/bin/node
+```
+
+Then configure Xcode:
+
+1. Open Xcode Settings.
+2. Go to **Intelligence**.
+3. In **Agents**, click **Add an Agent…**.
+4. Fill the sheet:
+
+   | Xcode field | Value |
+   | --- | --- |
+   | **Name** | `Pi` or `pi-xcode` |
+   | **Executable** | the absolute path from `command -v pi-xcode` |
+   | **Interpreter** | usually blank for the npm-installed executable; if launch fails, use the absolute path from `node -p 'process.execPath'` |
+   | **Arguments** | optional; enter one argv token per Xcode row |
+
+Recommended first-run Arguments rows:
+
+```text
+--debug
+--xcode-mcp-tools
+XcodeRead,XcodeGrep,XcodeGlob
+```
+
+Those three rows enable debug logging and expose only read/search Xcode tools. Remove the `--xcode-mcp-tools` rows later if you want write/build/run/device tools available.
+
+If Xcode does not launch the agent, set **Interpreter** to the absolute Node executable path from:
+
+```bash
+node -p 'process.execPath'
+```
+
+Then check the debug log:
+
+```bash
+tail -f ~/.pi/agent/pi-xcode/debug.log
+```
+
 ### Local checkout setup
 
-For the current local development build, configure Xcode with the built `dist/cli.js` file and an explicit Node interpreter.
+Use this only if you are developing `pi-xcode` from source rather than using the published package.
 
-1. Build `pi-xcode`:
+1. Build the local checkout:
 
    ```bash
-   cd /Users/ttiimmaahh/Developer/gitroot/personal/pi-extensions/pi-acp
+   git clone https://github.com/ttiimmaahh/pi-xcode.git
+   cd pi-xcode
    npm install
    npm run build
    ```
@@ -64,36 +146,19 @@ For the current local development build, configure Xcode with the built `dist/cl
 2. Find your Node executable:
 
    ```bash
-   which node
+   node -p 'process.execPath'
    ```
 
-   With `nvm`, this is usually something like:
+3. Configure Xcode:
 
-   ```text
-   /Users/ttiimmaahh/.nvm/versions/node/v24.15.0/bin/node
-   ```
+   | Xcode field | Value |
+   | --- | --- |
+   | **Name** | `Pi` or `pi-xcode` |
+   | **Executable** | the absolute path to `<repo>/dist/cli.js` |
+   | **Interpreter** | the absolute path returned by `node -p 'process.execPath'` |
+   | **Arguments** | optional; enter one argv token per Xcode row |
 
-3. Open Xcode Settings.
-4. Go to **Intelligence**.
-5. In **Agents**, click **Add an Agent…**.
-6. Fill the sheet:
-
-   - **Name:** `Pi`
-   - **Executable:** `/Users/ttiimmaahh/Developer/gitroot/personal/pi-extensions/pi-acp/dist/cli.js`
-   - **Interpreter:** your absolute Node path, for example `/Users/ttiimmaahh/.nvm/versions/node/v24.15.0/bin/node`
-   - **Arguments:** optional; enter one argv token per Xcode row. See examples below.
-
-Do not leave **Interpreter** blank for the local `dist/cli.js` setup. The script may work in Terminal while Xcode still fails to launch it without an explicit Node interpreter.
-
-### Installed package setup
-
-After global npm install, the scoped npm package still installs the `pi-xcode` executable. The executable is typically at:
-
-```bash
-which pi-xcode
-```
-
-Use that path as **Executable**. If the bin is a JavaScript shim and Xcode does not launch it reliably, use an explicit absolute Node **Interpreter** as above.
+For local `dist/cli.js`, do not leave **Interpreter** blank. The script may work in Terminal while Xcode still fails to launch it without an explicit Node interpreter.
 
 ## Xcode Arguments examples
 

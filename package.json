@@ -1,6 +1,6 @@
 {
   "name": "@ttiimmaahh/pi-xcode",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Use the Pi coding agent as an Xcode Intelligence ACP agent.",
   "license": "MIT",
   "author": "Tim Pearson (https://github.com/ttiimmaahh)",
