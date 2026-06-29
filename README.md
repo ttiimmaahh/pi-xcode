@@ -15,6 +15,12 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 - Pi extension-registered providers are loaded before model selection.
 - Xcode-provided MCP tools are connected by default and manually validated for read, search, write/delete, and allowlist filtering.
 
+## Requirements
+
+- **Xcode 27 or newer.** Xcode custom ACP agents are an Xcode 27+ feature. Xcode 27 is currently beta-only; Xcode 26 and earlier cannot launch `pi-xcode` as an Intelligence custom agent.
+- Node.js 20 or newer. Node 24 is used for local validation.
+- A working Pi configuration with an authenticated provider/model.
+
 ## Install
 
 For local development:
@@ -40,6 +46,8 @@ pi
 or configure provider API keys in your shell environment / Pi auth storage.
 
 ## Xcode setup
+
+> **Requires Xcode 27+.** If your Xcode Settings → Intelligence pane does not have custom agent support, you are probably running Xcode 26 or earlier. Install/use the Xcode 27 beta or newer before configuring `pi-xcode`.
 
 ### Local checkout setup
 

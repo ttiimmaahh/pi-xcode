@@ -1,6 +1,6 @@
 # Xcode manual test checklist
 
-Use this checklist after `npm run build` and after configuring Xcode Intelligence with the local `dist/cli.js` executable plus an explicit Node interpreter.
+Use this checklist with **Xcode 27 or newer** after `npm run build` and after configuring Xcode Intelligence with the local `dist/cli.js` executable plus an explicit Node interpreter. Xcode 26 and earlier do not support custom ACP agents.
 
 Before each run, pass `--debug` and watch:
 
