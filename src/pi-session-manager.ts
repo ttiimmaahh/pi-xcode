@@ -7,11 +7,17 @@ import {
 import type {
 	AgentSession,
 	CreateAgentSessionFromServicesOptions,
+	ToolDefinition,
 } from "@earendil-works/pi-coding-agent";
 import type * as acp from "@agentclientprotocol/sdk";
 import { XcodeMcpManager } from "./mcp/xcode-mcp-manager.js";
 import type { PiXcodeOptions } from "./types.js";
 import type { DebugLogger } from "./types.js";
+import { createAskUserQuestionTool } from "./acp/ask-user-question-tool.js";
+import { createEnterPlanModeTool } from "./acp/enter-plan-mode-tool.js";
+import { createExitPlanModeTool } from "./acp/exit-plan-mode-tool.js";
+import { createTodoWriteTool } from "./acp/todo-write-tool.js";
+import { createWebSearchTool } from "./acp/web-search-tool.js";
 import { ensureAbsolutePath } from "./util/paths.js";
 
 export interface ManagedPiSession {
@@ -21,12 +27,21 @@ export interface ManagedPiSession {
 	mcpManager?: XcodeMcpManager;
 }
 
+export interface PiSessionManagerHooks {
+	getActiveAcpSessionId(): string | undefined;
+	getConnection(): acp.AgentSideConnection | undefined;
+	onEnterPlanMode(sessionId: string): Promise<void> | void;
+	onExitPlanApproved(sessionId: string): Promise<void> | void;
+	onExitPlanRejected(sessionId: string): Promise<void> | void;
+}
+
 export class PiSessionManager {
 	private readonly sessions = new Map<string, ManagedPiSession>();
 
 	constructor(
 		private readonly options: PiXcodeOptions,
 		private readonly logger: DebugLogger,
+		private readonly hooks?: PiSessionManagerHooks,
 	) {}
 
 	async createSession(
@@ -89,14 +104,66 @@ export class PiSessionManager {
 			createOptions.excludeTools = this.options.excludeTools;
 		if (this.options.thinking)
 			createOptions.thinkingLevel = this.options.thinking;
+		const customTools: Array<ToolDefinition<any, any, any>> = [];
+		if (this.hooks) {
+			customTools.push(
+				createAskUserQuestionTool({
+					name: "ask_user_question",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+				}),
+				createAskUserQuestionTool({
+					name: "AskUserQuestion",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+				}),
+				createEnterPlanModeTool({
+					name: "EnterPlanMode",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					onEnterPlanMode: this.hooks.onEnterPlanMode,
+				}),
+				createEnterPlanModeTool({
+					name: "enter_plan_mode",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					onEnterPlanMode: this.hooks.onEnterPlanMode,
+				}),
+				createExitPlanModeTool({
+					name: "ExitPlanMode",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+					onApproved: this.hooks.onExitPlanApproved,
+					onRejected: this.hooks.onExitPlanRejected,
+				}),
+				createExitPlanModeTool({
+					name: "exit_plan_mode",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+					onApproved: this.hooks.onExitPlanApproved,
+					onRejected: this.hooks.onExitPlanRejected,
+				}),
+				createTodoWriteTool({
+					name: "TodoWrite",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+				}),
+				createTodoWriteTool({
+					name: "todo_write",
+					getSessionId: this.hooks.getActiveAcpSessionId,
+					getConnection: this.hooks.getConnection,
+				}),
+				createWebSearchTool({ name: "WebSearch" }),
+				createWebSearchTool({ name: "web_search_alias" }),
+			);
+		}
 		const mcpCustomTools = mcpManager?.getCustomTools();
 		if (mcpCustomTools && mcpCustomTools.length > 0) {
-			createOptions.customTools = mcpCustomTools;
+			customTools.push(...mcpCustomTools);
 			this.logger.log("Adding MCP custom tools to Pi session", {
 				toolCount: mcpCustomTools.length,
 				tools: mcpCustomTools.map((tool) => tool.name),
 			});
 		}
+		if (customTools.length > 0) createOptions.customTools = customTools;
 
 		const { session, modelFallbackMessage } =
 			await createAgentSessionFromServices(createOptions);

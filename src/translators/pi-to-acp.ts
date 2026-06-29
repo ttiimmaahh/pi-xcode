@@ -1,5 +1,7 @@
 import type * as acp from "@agentclientprotocol/sdk";
 import type { AgentSessionEvent } from "@earendil-works/pi-coding-agent";
+import { toolDiffContent } from "../acp/diff-artifacts.js";
+import { planEntriesFromToolInput } from "../acp/plan-progress.js";
 import { ensureAbsolutePath } from "../util/paths.js";
 
 type SessionUpdate = acp.SessionNotification["update"];
@@ -20,7 +22,9 @@ function piEventToAcpUpdate(
 	switch (event.type) {
 		case "message_update":
 			return messageUpdateToAcp(event);
-		case "tool_execution_start":
+		case "tool_execution_start": {
+			const planEntries = planEntriesFromToolInput(event.toolName, event.args);
+			if (planEntries) return { sessionUpdate: "plan", entries: planEntries };
 			return {
 				sessionUpdate: "tool_call",
 				toolCallId: event.toolCallId,
@@ -30,16 +34,21 @@ function piEventToAcpUpdate(
 				locations: extractLocations(event.toolName, event.args, cwd),
 				rawInput: event.args,
 			};
-		case "tool_execution_update":
+		}
+		case "tool_execution_update": {
+			const content =
+				toolDiffContent(event.toolName, event.args, event.partialResult, cwd) ??
+				toolResultContent(event.partialResult);
 			return {
 				sessionUpdate: "tool_call_update",
 				toolCallId: event.toolCallId,
 				status: "in_progress",
-				content: toolResultContent(event.partialResult),
+				content,
 				locations: extractLocations(event.toolName, event.args, cwd),
 				rawInput: event.args,
 				rawOutput: event.partialResult,
 			};
+		}
 		case "tool_execution_end":
 			return {
 				sessionUpdate: "tool_call_update",

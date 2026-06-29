@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.2.3 - 2026-06-29
+
+Improves Xcode ACP integration for plan-mode workflows, Claude-compatible tool names, artifacts, and local release validation.
+
+### Added
+
+- Advertise and handle ACP session modes for `default` and `plan`.
+- Add `/plan` handling that switches Pi into read-only plan mode before implementation.
+- Add Claude-compatible planning tools and aliases:
+  - `EnterPlanMode` / `enter_plan_mode`
+  - `ExitPlanMode` / `exit_plan_mode`
+- Present approved plans with ACP `switch_mode` permission requests using the plan markdown as tool-call content, matching the shape Xcode uses for plan review.
+- Add `ask_user_question` / `AskUserQuestion` ACP bridge.
+  - Uses ACP `elicitation/create` form mode when Xcode advertises/supports it.
+  - If Xcode returns `Method not supported by client: elicitation/create`, falls back to a manual chat prompt that prints the questions and answer choices so the user can reply normally.
+  - This preserves the expected rich-Q&A path for when Xcode enables ACP elicitation for custom agents.
+- Add Claude-compatible `TodoWrite` / `todo_write` bridge that sends ACP `sessionUpdate: "plan"` progress updates.
+- Add Claude-compatible `WebSearch` / `web_search_alias` compatibility tools that steer Claude-style prompts toward Pi's native `web_search` tool.
+- Add ACP diff artifact mapping for Pi `edit` and `write` tool inputs where possible.
+- Preserve file/line context from ACP resource links when Xcode sends line metadata.
+- Add `pi-xcode --version` for checking installed versions.
+- Add README update instructions for standalone global npm installs.
+- Add Vitest coverage for ACP bridge helpers and include tests in `npm run check`.
+
+### Changed
+
+- `npm run check` now runs typecheck, unit tests, build, and smoke test.
+- Plan mode now keeps question, plan-enter, plan-exit, todo, and web-search compatibility tools available while blocking edit/write/bash-like tools before approval.
+
+### Notes
+
+- Xcode 27 beta currently does not advertise ACP `clientCapabilities.elicitation.form` to this custom ACP agent in local testing, and rejects `elicitation/create`. The `ask_user_question` bridge therefore prints manual answer instructions today, while retaining the ACP elicitation implementation so rich Q&A should start working automatically if Apple enables it for custom ACP agents.
+- `WebSearch` is currently a compatibility alias, not a full web-search implementation. Prefer Pi's native `web_search` for actual web research.
+
 ## 0.2.2 - 2026-06-29
 
 Documentation update for public setup.

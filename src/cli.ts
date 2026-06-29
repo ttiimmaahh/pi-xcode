@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as acp from "@agentclientprotocol/sdk";
+import { readFileSync } from "node:fs";
 import { Readable, Writable } from "node:stream";
 import { createDebugLogger, defaultDebugLogPath } from "./util/debug.js";
 import { XcodeAgent } from "./xcode-agent.js";
@@ -51,6 +52,8 @@ function parseCliArgs(argv: string[]): PiXcodeOptions {
 			options.excludeXcodeMcpTools = parseList(
 				readValue(argv, ++index, flag, inlineValue),
 			);
+		} else if (flag === "--version" || flag === "-v") {
+			printVersionAndExit();
 		} else if (flag === "--help" || flag === "-h") {
 			printHelpAndExit();
 		} else {
@@ -122,9 +125,28 @@ function parseThinking(value: string): ThinkingLevel {
 
 function printHelpAndExit(): never {
 	process.stderr.write(
-		`pi-xcode\n\nACP adapter for using Pi as an Xcode Intelligence agent.\n\nOptions:\n  --debug                         Enable debug logging\n  --debug-log <path>              Debug log path (default: ${defaultDebugLogPath()})\n  --provider <provider>           Optional Pi provider override\n  --model <model>                 Optional Pi model override\n  --thinking <level>              Optional thinking override: off|minimal|low|medium|high|xhigh\n  --tools <list>                  Optional comma-separated Pi tool allowlist\n  --exclude-tools <list>          Optional comma-separated Pi tool denylist\n  --no-xcode-mcp                  Do not connect Xcode-provided MCP servers\n  --xcode-mcp-tools <list>        Optional comma-separated Xcode MCP tool allowlist\n  --exclude-xcode-mcp-tools <list> Optional comma-separated Xcode MCP tool denylist\n`,
+		`pi-xcode\n\nACP adapter for using Pi as an Xcode Intelligence agent.\n\nOptions:\n  --debug                         Enable debug logging\n  --debug-log <path>              Debug log path (default: ${defaultDebugLogPath()})\n  --provider <provider>           Optional Pi provider override\n  --model <model>                 Optional Pi model override\n  --thinking <level>              Optional thinking override: off|minimal|low|medium|high|xhigh\n  --tools <list>                  Optional comma-separated Pi tool allowlist\n  --exclude-tools <list>          Optional comma-separated Pi tool denylist\n  --no-xcode-mcp                  Do not connect Xcode-provided MCP servers\n  --xcode-mcp-tools <list>        Optional comma-separated Xcode MCP tool allowlist\n  --exclude-xcode-mcp-tools <list> Optional comma-separated Xcode MCP tool denylist\n  --version, -v                   Print pi-xcode version\n`,
 	);
 	process.exit(0);
+}
+
+function printVersionAndExit(): never {
+	process.stdout.write(`${readPackageVersion()}\n`);
+	process.exit(0);
+}
+
+function readPackageVersion(): string {
+	try {
+		const packageJsonUrl = new URL("../package.json", import.meta.url);
+		const packageJson = JSON.parse(readFileSync(packageJsonUrl, "utf8")) as {
+			version?: unknown;
+		};
+		return typeof packageJson.version === "string"
+			? packageJson.version
+			: "unknown";
+	} catch {
+		return "unknown";
+	}
 }
 
 async function main(): Promise<void> {

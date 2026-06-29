@@ -1,6 +1,6 @@
 {
   "name": "@ttiimmaahh/pi-xcode",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Use the Pi coding agent as an Xcode Intelligence ACP agent.",
   "license": "MIT",
   "author": "Tim Pearson (https://github.com/ttiimmaahh)",
@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x dist/cli.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check": "npm run typecheck && npm run build && npm run smoke",
+    "check": "npm run typecheck && npm run test && npm run build && npm run smoke",
     "test": "vitest run",
     "smoke": "tsx test/smoke-client.ts",
     "pack:dry-run": "npm pack --dry-run --json",

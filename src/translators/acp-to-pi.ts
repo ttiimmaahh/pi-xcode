@@ -1,5 +1,5 @@
 import type * as acp from "@agentclientprotocol/sdk";
-import { fileUriToPath } from "../util/paths.js";
+import { describeResourceLink } from "../acp/inline-context.js";
 
 export interface PiImageContent {
 	type: "image";
@@ -67,15 +67,5 @@ function appendEmbeddedResource(
 }
 
 function appendResourceLink(textParts: string[], link: acp.ResourceLink): void {
-	const filePath = fileUriToPath(link.uri);
-	if (filePath) {
-		textParts.push(`Referenced file: @${filePath}`);
-		return;
-	}
-
-	const title = link.title ?? link.name;
-	const description = link.description ? `\n${link.description}` : "";
-	textParts.push(
-		`Referenced resource link: ${title}\n${link.uri}${description}`,
-	);
+	textParts.push(describeResourceLink(link));
 }

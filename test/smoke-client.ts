@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import * as acp from "@agentclientprotocol/sdk";
 import { spawn } from "node:child_process";
 import { Readable, Writable } from "node:stream";
@@ -26,8 +28,13 @@ async function main(): Promise<void> {
 					process.stderr.write(update.content.text);
 				}
 			})
-			.onRequest(acp.CLIENT_METHODS.session_request_permission, () => ({
-				outcome: { outcome: "selected", optionId: "allow" },
+			.onRequest(acp.CLIENT_METHODS.session_request_permission, (ctx) => ({
+				outcome: {
+					outcome: "selected",
+					optionId:
+						ctx.params.options.find((option) => option.kind.startsWith("allow"))
+							?.optionId ?? "allow",
+				},
 			}))
 			.connectWith(stream, async (agent) => {
 				const init = await agent.request(acp.methods.agent.initialize, {
@@ -46,6 +53,22 @@ async function main(): Promise<void> {
 					mcpServers: [],
 				});
 				assert(session.sessionId.length > 0, "Missing session ID");
+				assert(
+					session.modes?.currentModeId === "default",
+					"Missing default session mode",
+				);
+				assert(
+					session.modes.availableModes.some((mode) => mode.id === "plan"),
+					"Missing plan session mode",
+				);
+				await agent.request(acp.methods.agent.session.setMode, {
+					sessionId: session.sessionId,
+					modeId: "plan",
+				});
+				await agent.request(acp.methods.agent.session.setMode, {
+					sessionId: session.sessionId,
+					modeId: "default",
+				});
 
 				if (runPrompt) {
 					const prompt = agent.request(acp.methods.agent.session.prompt, {

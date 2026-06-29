@@ -6,7 +6,7 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 
 ## Status
 
-`pi-xcode` 0.2.2 is validated as an Xcode-launched ACP adapter:
+`pi-xcode` 0.2.3 is validated as an Xcode-launched ACP adapter:
 
 - Xcode can add and launch `pi-xcode` as an ACP agent.
 - Xcode conversations stream Pi responses.
@@ -14,6 +14,8 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 - Provider/model overrides can be passed from Xcode argument rows.
 - Pi extension-registered providers are loaded before model selection.
 - Xcode-provided MCP tools are connected by default and manually validated for read, search, write/delete, and allowlist filtering.
+- Plan-mode workflows expose ACP `default`/`plan` modes and Claude-compatible plan tools (`EnterPlanMode`, `ExitPlanMode`, `TodoWrite`).
+- `ask_user_question` is bridged toward ACP form elicitation when available, with a manual chat fallback while Xcode 27 beta does not advertise `elicitation.form` to custom ACP agents.
 
 ## Requirements
 
@@ -40,7 +42,18 @@ Verify the executable is available:
 ```bash
 which pi-xcode
 pi-xcode --help
+pi-xcode --version
 ```
+
+Update an existing global install with:
+
+```bash
+npm update -g @ttiimmaahh/pi-xcode
+# or force the latest published version
+npm install -g @ttiimmaahh/pi-xcode@latest
+```
+
+`pi-xcode` is a standalone ACP executable that Xcode launches directly. It is not currently loaded as a normal Pi extension package, so `pi update --extensions` does not update the globally installed `pi-xcode` binary unless you intentionally installed and pointed Xcode at a Pi-managed package copy. For the recommended setup, use npm's global update command above.
 
 For local development from a source checkout:
 
@@ -393,6 +406,34 @@ The smoke client verifies ACP handshake and session creation without contacting 
 ```bash
 PI_XCODE_SMOKE_PROMPT=1 npm run smoke
 ```
+
+## Updating
+
+For the recommended global npm install, update with:
+
+```bash
+npm update -g @ttiimmaahh/pi-xcode
+pi-xcode --version
+```
+
+If npm reports no update but you want to force the newest published version:
+
+```bash
+npm install -g @ttiimmaahh/pi-xcode@latest
+```
+
+Xcode stores the executable path you configured in Intelligence settings. If `command -v pi-xcode` points to the same path after updating, no Xcode setting changes are needed. If your Node/npm manager changes the global bin path, update Xcode's **Executable** field to the new `command -v pi-xcode` output.
+
+### Update notifications
+
+`pi-xcode` does not currently auto-check npm for updates at runtime. Check the version manually with:
+
+```bash
+pi-xcode --version
+npm view @ttiimmaahh/pi-xcode version
+```
+
+Release notes are published in `CHANGELOG.md`, GitHub Releases, and npm package versions. Because `pi-xcode` runs as a standalone Xcode ACP agent rather than a Pi-loaded extension, Pi's extension updater is not the primary update channel.
 
 ## Releasing
 
