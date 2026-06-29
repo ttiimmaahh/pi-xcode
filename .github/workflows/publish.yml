@@ -1,0 +1,99 @@
+name: Publish
+
+# Tag-driven release. Bump the version locally with `npm version <patch|minor|major>`
+# (which commits package.json + tags vX.Y.Z), then `git push --follow-tags`.
+# This workflow fires on the v* tag, verifies the tag matches package.json,
+# checks the package, publishes to npm, and creates a matching GitHub Release.
+#
+# Auth is npm Trusted Publishing via OIDC — NO token. The package must have this
+# repo + workflow registered as a Trusted Publisher on npmjs.com (one-time setup;
+# see README "Releasing"). npm detects the OIDC environment automatically and
+# emits provenance attestations by default.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify tag matches package.json version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version="$(node -p "require('./package.json').version")"
+          echo "tag=${tag_version} package.json=${pkg_version}"
+          if [ "${tag_version}" != "${pkg_version}" ]; then
+            echo "::error::Tag v${tag_version} does not match package.json version ${pkg_version}"
+            exit 1
+          fi
+
+      - name: Check
+        run: npm run check
+
+      - name: Pack dry run
+        run: npm run pack:dry-run
+
+      - name: Check npm publication status
+        id: npm_status
+        run: |
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+          if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+            echo "published=true" >> "${GITHUB_OUTPUT}"
+            echo "${package_name}@${package_version} is already published; skipping npm publish."
+          else
+            echo "published=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Publish to npm
+        if: steps.npm_status.outputs.published != 'true'
+        run: npm publish
+
+      - name: Prepare GitHub Release notes
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          awk -v version="${tag_version}" '
+            $0 ~ "^## " version "( -|$)" { in_section = 1; next }
+            in_section && $0 ~ "^## " { exit }
+            in_section { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "See CHANGELOG.md for release details." > release-notes.md
+          fi
+
+          printf "\n---\n\nPublished to npm: https://www.npmjs.com/package/pi-xcode/v/%s\n" "${tag_version}" >> release-notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release edit "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file release-notes.md \
+              --verify-tag
+          fi

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tgz
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+coverage/
+.nyc_output/
+.vitest/
+.pi/
+.pi-lens/
+*.tsbuildinfo

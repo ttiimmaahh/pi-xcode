@@ -1,0 +1,67 @@
+{
+  "name": "pi-xcode",
+  "version": "0.2.0",
+  "description": "Use the Pi coding agent as an Xcode Intelligence ACP agent.",
+  "license": "MIT",
+  "author": "Tim Pearson (https://github.com/ttiimmaahh)",
+  "type": "module",
+  "bin": {
+    "pi-xcode": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check": "npm run typecheck && npm run build && npm run smoke",
+    "test": "vitest run",
+    "smoke": "tsx test/smoke-client.ts",
+    "pack:dry-run": "npm pack --dry-run --json",
+    "prepublishOnly": "npm run check"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi",
+    "xcode",
+    "acp",
+    "agent-client-protocol",
+    "coding-agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ttiimmaahh/pi-xcode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ttiimmaahh/pi-xcode/issues"
+  },
+  "homepage": "https://github.com/ttiimmaahh/pi-xcode#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^1.1.0",
+    "@earendil-works/pi-coding-agent": "^0.80.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "typebox": "^1.3.2",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
