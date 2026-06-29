@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1 - 2026-06-29
+
+Release-cycle validation update for the scoped npm package.
+
+### Changed
+
+- Publish package as `@ttiimmaahh/pi-xcode` because npm blocks the unscoped `pi-xcode` name as too similar to unrelated package `pixcode`.
+- Keep the installed executable/bin name as `pi-xcode`.
+- Document the Xcode 27+ requirement more explicitly; Xcode 26 and earlier cannot run custom ACP agents.
+- Update release workflow to publish the scoped package with `npm publish --access public`.
+
 ## 0.2.0 - 2026-06-29
 
 First release candidate for `pi-xcode` as an Xcode-focused ACP adapter for Pi.
