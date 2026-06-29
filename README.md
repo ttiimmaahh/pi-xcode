@@ -33,7 +33,7 @@ npm run build
 After a public npm release, install with:
 
 ```bash
-npm install -g pi-xcode
+npm install -g @ttiimmaahh/pi-xcode
 ```
 
 Make sure Pi itself is authenticated/configured before launching from Xcode:
@@ -87,7 +87,7 @@ Do not leave **Interpreter** blank for the local `dist/cli.js` setup. The script
 
 ### Installed package setup
 
-After global npm install, the executable is typically the `pi-xcode` bin path:
+After global npm install, the scoped npm package still installs the `pi-xcode` executable. The executable is typically at:
 
 ```bash
 which pi-xcode
@@ -339,7 +339,7 @@ This repo follows the same tag-driven release process as the other `ttiimmaahh` 
 4. Push with `git push --follow-tags`.
 5. The tag-triggered GitHub Actions workflow verifies the tag, runs checks, publishes to npm using Trusted Publishing/OIDC, and creates a GitHub Release.
 
-One-time npm setup: configure `ttiimmaahh/pi-xcode` and `.github/workflows/publish.yml` as a Trusted Publisher for the `pi-xcode` package on npmjs.com.
+One-time npm setup: configure `ttiimmaahh/pi-xcode` and `.github/workflows/publish.yml` as a Trusted Publisher for the `@ttiimmaahh/pi-xcode` package on npmjs.com.
 
 ## License
 

@@ -1,11 +1,11 @@
 # Release checklist
 
-Use this checklist before publishing `pi-xcode`.
+Use this checklist before publishing `@ttiimmaahh/pi-xcode`.
 
 ## Version and metadata
 
 - [ ] Confirm `package.json` version is correct.
-- [ ] Confirm package name is `pi-xcode` or intentionally scoped.
+- [ ] Confirm package name is `@ttiimmaahh/pi-xcode`.
 - [ ] Confirm npm package availability/ownership.
 - [ ] Confirm `description`, `keywords`, `license`, `repository`, `bugs`, `homepage`, `files`, `bin`, and `engines` are correct.
 - [ ] Confirm `LICENSE` is present and correct.
@@ -57,7 +57,7 @@ npm pack --dry-run --json
 Optionally install the generated tarball into a temporary project:
 
 ```bash
-npm install -g ./pi-xcode-<version>.tgz
+npm install -g ./ttiimmaahh-pi-xcode-<version>.tgz
 pi-xcode --help
 ```
 
@@ -66,7 +66,7 @@ pi-xcode --help
 Only after all checks pass:
 
 ```bash
-npm publish
+npm publish --access public
 ```
 
 For first public release, consider publishing with provenance if the package is released from CI.

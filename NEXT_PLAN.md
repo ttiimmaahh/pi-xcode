@@ -65,7 +65,7 @@ Completed:
 ### Remaining before publish
 
 1. Confirm final GitHub repository URL and initialize/move into a git repository if needed.
-2. Confirm npm package availability/ownership for `pi-xcode`.
+2. Confirm npm package availability/ownership for `@ttiimmaahh/pi-xcode`.
 3. Run release checklist from a clean checkout/install:
 
    ```bash

@@ -81,7 +81,7 @@ jobs:
             echo "See CHANGELOG.md for release details." > release-notes.md
           fi
 
-          printf "\n---\n\nPublished to npm: https://www.npmjs.com/package/pi-xcode/v/%s\n" "${tag_version}" >> release-notes.md
+          printf "\n---\n\nPublished to npm: https://www.npmjs.com/package/@ttiimmaahh/pi-xcode/v/%s\n" "${tag_version}" >> release-notes.md
 
       - name: Create GitHub Release
         env:
