@@ -1,6 +1,6 @@
 {
   "name": "@ttiimmaahh/pi-xcode",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Use the Pi coding agent as an Xcode Intelligence ACP agent.",
   "license": "MIT",
   "author": "Tim Pearson (https://github.com/ttiimmaahh)",
@@ -49,11 +49,11 @@
   },
   "homepage": "https://github.com/ttiimmaahh/pi-xcode#readme",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19.0"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^1.1.0",
-    "@earendil-works/pi-coding-agent": "^0.80.2",
+    "@earendil-works/pi-coding-agent": "^0.80.10",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "typebox": "^1.3.2",
     "zod": "^4.1.13"

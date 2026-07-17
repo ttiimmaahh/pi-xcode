@@ -74,16 +74,16 @@ export class PiSessionManager {
 		}
 
 		const services = await createAgentSessionServices({ cwd, settingsManager });
+		const configuredModels = services.modelRuntime.getModels();
+		const availableModels = await services.modelRuntime.getAvailable();
 		this.logger.log("Pi services created", {
 			cwd: services.cwd,
 			agentDir: services.agentDir,
 			diagnosticCount: services.diagnostics.length,
-			availableModelCount: services.modelRegistry.getAvailable().length,
-			configuredModelCount: services.modelRegistry.getAll().length,
-			configuredProviders: summarizeProviders(services.modelRegistry.getAll()),
-			availableProviders: summarizeProviders(
-				services.modelRegistry.getAvailable(),
-			),
+			availableModelCount: availableModels.length,
+			configuredModelCount: configuredModels.length,
+			configuredProviders: summarizeProviders(configuredModels),
+			availableProviders: summarizeProviders(availableModels),
 			settings: {
 				defaultProvider: settingsManager.getDefaultProvider(),
 				defaultModel: settingsManager.getDefaultModel(),
@@ -223,7 +223,7 @@ export class PiSessionManager {
 }
 
 function summarizeProviders(
-	models: Array<{ provider: string }>,
+	models: ReadonlyArray<{ provider: string }>,
 ): Array<{ provider: string; modelCount: number }> {
 	const counts = new Map<string, number>();
 	for (const model of models) {

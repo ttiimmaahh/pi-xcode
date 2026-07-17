@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.4 - 2026-07-17
+
+Updates the embedded Pi SDK integration for the latest Pi release.
+
+### Changed
+
+- Update `@earendil-works/pi-coding-agent` from `^0.80.2` to `^0.80.10`.
+- Migrate model diagnostics from the removed SDK service `modelRegistry` to the current `modelRuntime` API.
+- Raise the minimum supported Node.js version from 20 to 22.19 to match Pi's runtime requirement.
+
 ## 0.2.3 - 2026-06-29
 
 Improves Xcode ACP integration for plan-mode workflows, Claude-compatible tool names, artifacts, and local release validation.

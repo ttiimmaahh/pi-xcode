@@ -6,7 +6,7 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 
 ## Status
 
-`pi-xcode` 0.2.3 is validated as an Xcode-launched ACP adapter:
+`pi-xcode` 0.2.4 updates the Xcode-launched ACP adapter for Pi 0.80.10. The integration supports:
 
 - Xcode can add and launch `pi-xcode` as an ACP agent.
 - Xcode conversations stream Pi responses.
@@ -20,7 +20,7 @@ Use the [Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-codin
 ## Requirements
 
 - **Xcode 27 or newer.** Xcode custom ACP agents are an Xcode 27+ feature. Xcode 27 is currently beta-only; Xcode 26 and earlier cannot launch `pi-xcode` as an Intelligence custom agent.
-- **Node.js 20 or newer.** Node 24 is recommended and is used for release validation.
+- **Node.js 22.19 or newer.** Node 24 is recommended and is used for release validation.
 - A working Pi configuration with an authenticated provider/model.
 
 Check your Node version with:
